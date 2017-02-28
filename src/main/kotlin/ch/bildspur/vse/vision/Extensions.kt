@@ -170,3 +170,21 @@ fun Mat.getRegionMask(regionLabel: Int): Mat {
     Core.inRange(this, Scalar(regionLabel.toDouble()), Scalar(regionLabel.toDouble()), labeledMask)
     return labeledMask
 }
+
+fun Long.toTimeStamp(): String {
+    val second = this / 1000 % 60
+    val minute = this / (1000 * 60) % 60
+    val hour = this / (1000 * 60 * 60) % 24
+
+    return String.format("%02d:%02d:%02d:%d", hour, minute, second, this)
+}
+
+fun DoubleArray.median() : Double
+{
+    this.sort()
+
+    if(this.size % 2 == 0)
+        return (this[this.size / 2 - 1] + this[this.size / 2]) / 2.0
+    else
+        return this[this.size / 2]
+}

@@ -1,9 +1,11 @@
 package ch.bildspur.vse
 
-import ch.bildspur.vse.vision.alginTo
-import ch.bildspur.vse.vision.resize
-import ch.bildspur.vse.vision.save
+import ch.bildspur.vse.vision.*
+import ch.fhnw.afpars.util.Stopwatch
+import org.opencv.core.Core
 import org.opencv.core.Mat
+import org.opencv.core.Scalar
+import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
 import org.opencv.videoio.VideoCapture
 
@@ -22,10 +24,52 @@ object StillExtractor {
 
         // align frames at keyFrame
         println("aligning frames to template...")
-        val alignedFrames = sequence.frames.pmap { it.alginTo(sequence.keyFrame) }
+
+        val watch = Stopwatch()
+        watch.start()
+        val alignedFrames = sequence.frames.pmap { it.alignTo(sequence.keyFrame, iterations = 1000) }.toTypedArray()
+        println(watch.elapsed().toTimeStamp())
+
         alignedFrames.forEachIndexed { i, mat -> mat.save("result/frame_$i.jpg") }
 
-        return Mat()
+
+        // create median image of all color information
+        println("creating median image...")
+        val m = createMedianImage(listOf(sequence.keyFrame, *alignedFrames))
+        println(watch.elapsed().toTimeStamp())
+
+        return m
+    }
+
+    fun createMedianImage(frames : List<Mat>) : Mat
+    {
+        val result = frames[0].zeros()
+        val vecSize = result.get(0, 0).size
+
+        // iterate over every pixel
+        for (x in 0 until result.width()) {
+            for (y in 0 until result.height()) {
+                val values = Array(vecSize, { DoubleArray(frames.size) })
+
+                // grab all pixel values of this current position
+                for(f in 0 until frames.size)
+                {
+                    val vec = frames[f].get(y, x)
+
+                    for(v in 0 until vec.size) {
+                        values[v][f] = vec[v]
+                    }
+                }
+
+                // create median vec
+                val medianVec = values.map { it.median() }
+
+                // set scalar
+                result.put(y, x, *medianVec.toDoubleArray())
+            }
+        }
+
+        return result
     }
 
     fun readVideoFile(videoPath : String, frameIndex : Int, offsetCount : Int) : ImageSequence
@@ -52,7 +96,7 @@ object StillExtractor {
             }
 
             if(success) {
-                val resizedFrame = frame.resize(0, 200)
+                val resizedFrame = frame.resize(0, 500)
 
                 if (counter == frameIndex)
                     keyFrame = resizedFrame

@@ -2,8 +2,6 @@ package ch.bildspur.vse
 
 import ch.bildspur.vse.vision.save
 import org.opencv.core.Core
-import org.opencv.imgcodecs.Imgcodecs
-import org.opencv.imgproc.Imgproc
 import kotlin.system.exitProcess
 
 /**

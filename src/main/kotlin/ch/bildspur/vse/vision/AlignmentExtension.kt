@@ -11,7 +11,7 @@ import org.opencv.video.Video
 /**
  * Created by cansik on 28.02.17.
  */
-fun Mat.alginTo(input : Mat, warpMode : Int = Video.MOTION_EUCLIDEAN, iterations : Int = 5000, terminationEps : Double = 1e-10) : Mat
+fun Mat.alignTo(input : Mat, warpMode : Int = Video.MOTION_EUCLIDEAN, iterations : Int = 5000, terminationEps : Double = 1e-10) : Mat
 {
     val img = Mat()
     val template = Mat()
