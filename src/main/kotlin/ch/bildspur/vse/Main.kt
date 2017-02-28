@@ -28,7 +28,7 @@ class Main {
 
             println("extracting $videoFilePath...")
 
-            val image = StillExtractor.extract(videoFilePath)
+            val image = StillExtractor.extract(videoFilePath, 10, 10)
             image.save(imageFilePath)
 
             println("image extracted!")
