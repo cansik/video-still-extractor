@@ -2,11 +2,7 @@ package ch.bildspur.vse
 
 import ch.bildspur.vse.vision.*
 import ch.fhnw.afpars.util.Stopwatch
-import org.opencv.core.Core
 import org.opencv.core.Mat
-import org.opencv.core.Scalar
-import org.opencv.core.Size
-import org.opencv.imgproc.Imgproc
 import org.opencv.videoio.VideoCapture
 
 /**
@@ -28,20 +24,25 @@ object StillExtractor {
         val watch = Stopwatch()
         watch.start()
         val alignedFrames = sequence.frames.pmap { it.alignTo(sequence.keyFrame, iterations = 1000) }.toTypedArray()
+        alignedFrames.forEach { it.sharpen(3.0) }
+
         println(watch.elapsed().toTimeStamp())
 
         alignedFrames.forEachIndexed { i, mat -> mat.save("result/frame_$i.jpg") }
 
 
+
         // create median image of all color information
-        println("creating median image...")
-        val m = createMedianImage(listOf(sequence.keyFrame, *alignedFrames))
+        println("creating compressed image...")
+        val m = createCompressedImage(listOf(sequence.keyFrame, *alignedFrames))
         println(watch.elapsed().toTimeStamp())
+
+        println("Total time: ${watch.stop().toTimeStamp()}")
 
         return m
     }
 
-    fun createMedianImage(frames : List<Mat>) : Mat
+    fun createCompressedImage(frames : List<Mat>) : Mat
     {
         val result = frames[0].zeros()
         val vecSize = result.get(0, 0).size
@@ -62,10 +63,10 @@ object StillExtractor {
                 }
 
                 // create median vec
-                val medianVec = values.map { it.median() }
+                val compressedVec = values.map { it.median() }
 
                 // set scalar
-                result.put(y, x, *medianVec.toDoubleArray())
+                result.put(y, x, *compressedVec.toDoubleArray())
             }
         }
 
@@ -96,7 +97,7 @@ object StillExtractor {
             }
 
             if(success) {
-                val resizedFrame = frame.resize(0, 500)
+                val resizedFrame = frame
 
                 if (counter == frameIndex)
                     keyFrame = resizedFrame

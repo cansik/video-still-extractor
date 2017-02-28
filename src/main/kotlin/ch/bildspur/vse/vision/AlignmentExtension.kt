@@ -11,14 +11,20 @@ import org.opencv.video.Video
 /**
  * Created by cansik on 28.02.17.
  */
-fun Mat.alignTo(input : Mat, warpMode : Int = Video.MOTION_EUCLIDEAN, iterations : Int = 5000, terminationEps : Double = 1e-10) : Mat
+fun Mat.alignTo(input : Mat, warpMode : Int = Video.MOTION_EUCLIDEAN, iterations : Int = 5000, terminationEps : Double = 1e-10, imageWidth : Int = this.width()) : Mat
 {
-    val img = Mat()
-    val template = Mat()
+    var img = Mat()
+    var template = Mat()
 
     // create grayscale images
     Imgproc.cvtColor(this, img, Imgproc.COLOR_BGR2GRAY)
     Imgproc.cvtColor(input, template, Imgproc.COLOR_BGR2GRAY)
+
+    if(imageWidth != this.width())
+    {
+        img = img.resize(imageWidth, 0)
+        template = template.resize(imageWidth, 0)
+    }
 
     // Set a 2x3 or 3x3 warp matrix depending on the motion model.
     val warpMatrix = if(warpMode == Video.MOTION_HOMOGRAPHY) Mat.eye(3, 3, CvType.CV_32F) else Mat.eye(2, 3, CvType.CV_32F)

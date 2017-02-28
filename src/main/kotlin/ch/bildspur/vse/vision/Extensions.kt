@@ -188,3 +188,13 @@ fun DoubleArray.median() : Double
     else
         return this[this.size / 2]
 }
+
+fun Mat.sharpen(sigmaX: Double = 3.0) {
+    this.sharpen(this, sigmaX)
+}
+
+fun Mat.sharpen(dest: Mat, sigmaX: Double = 3.0) {
+    val img = Mat()
+    Imgproc.GaussianBlur(this, img, Size(0.0, 0.0), sigmaX)
+    Core.addWeighted(this, 1.5, img, -0.5, 0.0, dest)
+}
