@@ -34,10 +34,10 @@ fun Mat.alginTo(input : Mat, warpMode : Int = Video.MOTION_EUCLIDEAN, iterations
 
     if (warpMode !== Video.MOTION_HOMOGRAPHY)
         // Use warpAffine for Translation, Euclidean and Affine
-        Imgproc.warpAffine(img, alignedImage, warpMatrix, img.size(), Imgproc.INTER_LINEAR + Imgproc.WARP_INVERSE_MAP)
+        Imgproc.warpAffine(this, alignedImage, warpMatrix, img.size(), Imgproc.INTER_LINEAR + Imgproc.WARP_INVERSE_MAP)
     else
         // Use warpPerspective for Homography
-        Imgproc.warpPerspective(img, alignedImage, warpMatrix, img.size(), Imgproc.INTER_LINEAR + Imgproc.WARP_INVERSE_MAP)
+        Imgproc.warpPerspective(this, alignedImage, warpMatrix, img.size(), Imgproc.INTER_LINEAR + Imgproc.WARP_INVERSE_MAP)
 
     return alignedImage
 }
