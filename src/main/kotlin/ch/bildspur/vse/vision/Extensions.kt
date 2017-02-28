@@ -66,6 +66,10 @@ fun Mat.copy(): Mat {
     return m
 }
 
+fun Mat.save(filePath : String) {
+    Imgcodecs.imwrite(filePath, this)
+}
+
 fun Mat.resize(width: Int, height: Int): Mat {
     assert(width > 0 || height > 0)
 
